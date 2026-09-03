@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="A local-first meal planner built for people and their agents with WebMCP." />
+  <meta name="description" content="Plan meals, save recipes and build shopping lists with WebMCP." />
   <meta name="theme-color" content="#0b0d10" />
   <title>Savour — plan with your agent</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
@@ -17,7 +17,6 @@
       </a>
 
       <nav class="tabs" aria-label="Meal planner sections">
-        <p class="nav-label">Workspace</p>
         <button class="tab active" data-tab="planner" type="button">
           <span>Weekly plan</span>
         </button>
@@ -31,6 +30,9 @@
           <span>Shopping</span>
         </button>
       </nav>
+      <button class="agent-prompt" type="button" data-copy-agent-prompt>
+        Copy agent prompt
+      </button>
     </aside>
 
     <section class="workspace">
@@ -42,10 +44,6 @@
           <span>Checking WebMCP…</span>
         </span>
         <div class="topbar-actions">
-          <span class="privacy-note"><i></i> Saved on this device</span>
-          <button class="button ghost agent-prompt" type="button" data-copy-agent-prompt>
-            Agent prompt
-          </button>
           <button id="exportButton" class="button ghost" type="button">
             <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"/></svg>
             Export data
@@ -69,10 +67,6 @@
               </button>
             </div>
           </div>
-          <div class="planner-intro">
-            <span>Click a slot to add or edit a meal</span>
-            <span>Breakfast · Lunch · Dinner</span>
-          </div>
           <div id="plannerGrid" class="planner-grid"></div>
         </section>
 
@@ -80,7 +74,6 @@
           <div class="section-head">
             <div>
               <h2>Your recipes</h2>
-              <p class="section-copy">Every ingredient stays structured, so servings and shopping quantities remain exact.</p>
             </div>
             <button id="addRecipeButton" class="button primary" type="button">
               <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
@@ -94,7 +87,6 @@
           <div class="section-head">
             <div>
               <h2>Your pantry</h2>
-              <p class="section-copy">Track what is on hand and Savour will subtract it from your next shop.</p>
             </div>
           </div>
           <form id="pantryForm" class="inline-form">
@@ -116,7 +108,6 @@
           <div class="section-head">
             <div>
               <h2>Shopping list</h2>
-              <p class="section-copy">Scaled to planned servings and reduced by matching pantry quantities.</p>
             </div>
             <button id="copyShoppingButton" class="button primary" type="button">
               <svg viewBox="0 0 24 24"><path d="M8 8h11v12H8zM5 16H4V4h11v1"/></svg>
