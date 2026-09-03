@@ -16,7 +16,7 @@ The application stores recipes, pantry inventory, dated meal plans and optional 
 | History | Meal-plan records remain queryable by date range |
 | Pantry | Ingredient name, quantity and unit |
 | Shopping list | Required quantity, pantry quantity used, remaining quantity and contributing recipes |
-| Shopping profile | Optional user-supplied location, preferred stores and currency |
+| Shopping profile | Optional user-supplied location and preferred stores; pricing currency is resolved by the agent from that location |
 | Price quotes | Ingredient, package size, store, price, location, promotion, expiry and optional source URL |
 | Shopping estimate | Package-aware estimated cost per item, priced-item coverage and basket total |
 | Export | Complete core meal-planning state snapshot as JSON |
@@ -29,7 +29,7 @@ Deleting a recipe also removes meal-plan entries that reference it. Setting a pa
 
 ## WebMCP implementation
 
-The application registers 18 tools with document.modelContext.registerTool():
+The application registers 19 tools with document.modelContext.registerTool():
 
 | Tool | Operation |
 | --- | --- |
@@ -47,7 +47,8 @@ The application registers 18 tools with document.modelContext.registerTool():
 | build_shopping_list | Calculate shopping quantities for a date range |
 | export_meal_data | Return the complete stored meal-planning state |
 | shopping_price_context | Return the saved shopping location, preferred stores, current shopping requirements and existing current price quotes |
-| set_shopping_profile | Save or clear the user-supplied shopping location, preferred stores and currency |
+| set_shopping_profile | Save or clear the user-supplied shopping location and preferred stores |
+| set_shopping_currency | Set the ISO 4217 currency inferred by the agent from the user's saved shopping location |
 | save_price_quotes | Save researched package prices and relevant promotions for shopping-list ingredients |
 | priced_shopping_list | Return package-aware item estimates, store/deal details, coverage and estimated basket total |
 | clear_price_quotes | Clear saved prices and promotions without changing recipes, pantry, meal plan or shopping location |
@@ -93,15 +94,18 @@ Optional shopping-price request:
 Expected tool sequence:
 
 1. `shopping_price_context` reads the user's explicit location/store preferences and current ingredient requirements.
-2. The agent researches current prices or promotions using whatever external sources are available to it.
-3. `save_price_quotes` writes structured package prices and promotion metadata back to the page.
-4. `priced_shopping_list` calculates whole-package purchase costs and the basket total.
-5. The Shopping view shows quantities, per-item estimates, retailer/deal information and estimate coverage.
+2. The agent determines the correct local ISO 4217 currency from that saved location and writes it with `set_shopping_currency`.
+3. The agent researches current prices or promotions using whatever external sources are available to it in that market.
+4. `save_price_quotes` writes structured package prices and promotion metadata back to the page.
+5. `priced_shopping_list` calculates whole-package purchase costs and the basket total in the resolved local currency.
+6. The Shopping view shows quantities, per-item estimates, retailer/deal information and estimate coverage.
+
+When the user changes the saved shopping location, the currency is marked unresolved until the agent resolves it again. The application does not use device geolocation and does not assume a country from the browser.
 
 This division is intentional:
 
 - The user supplies preferences and explicitly chooses whether to store a shopping location.
-- The agent handles selection, research and multi-step orchestration.
+- The agent handles selection, market/currency resolution, research and multi-step orchestration.
 - The website owns persistence, validation, state mutation, quantity calculations and package-aware cost calculations.
 - No third-party grocery API key is embedded in the static frontend.
 
@@ -124,9 +128,11 @@ The interface remains usable without WebMCP. Agent tools require ChatGPT's in-ap
 
 ## Price data
 
-Price data is deliberately provider-agnostic. The page does not contain retailer credentials or a hard-coded grocery data provider. Price quotes are structured records written by the user or an agent and include location and freshness metadata where available.
+Price data is deliberately provider-agnostic. The page does not contain retailer credentials, a hard-coded grocery data provider or a hard-coded national currency. Price quotes are structured records written by the user or an agent and include location and freshness metadata where available.
 
-This keeps the deployed application static while allowing an agent to use current regional data sources when available. Expired promotion quotes are ignored automatically, and quotes from a different explicitly saved location are not used in the active estimate.
+The user supplies only the shopping location they want used. The agent maps that location to the appropriate ISO 4217 currency and uses regional price sources when available. This keeps the same workflow usable across countries while allowing price-data coverage to vary by market.
+
+Expired promotion quotes are ignored automatically, and quotes from a different explicitly saved location are not used in the active estimate.
 
 ## Run locally
 
@@ -151,9 +157,10 @@ Render configuration is included in render.yaml. Netlify configuration is includ
 | index.html | Application markup and controls |
 | styles.css | Responsive interface styles |
 | app.js | Core state model, calculations, UI logic and WebMCP tools |
-| recipe-view.js | Read-only recipe-view behavior |
+| recipe-view.js | Read-only recipe-view behavior and localization-helper loader |
 | recipe-view.css | Read-only recipe-view styling |
 | shopping-pricing.js | Optional location profile, price quotes, package-aware basket estimates, promotions and pricing WebMCP tools |
+| shopping-localization.js | Agent-resolved local currency behavior and WebMCP currency tool |
 | favicon.svg | Site icon |
 | thumbnail.svg | Devpost/project thumbnail based on the site icon |
 | render.yaml | Render static-site configuration |
