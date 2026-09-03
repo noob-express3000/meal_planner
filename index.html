@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="A local-first meal planner built for people and their agents with WebMCP." />
-  <meta name="theme-color" content="#ffffff" />
+  <meta name="theme-color" content="#0b0d10" />
   <title>Savour — plan with your agent</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="./styles.css" />
@@ -19,35 +19,18 @@
       <nav class="tabs" aria-label="Meal planner sections">
         <p class="nav-label">Workspace</p>
         <button class="tab active" data-tab="planner" type="button">
-          <svg viewBox="0 0 24 24"><path d="M4 5.5h16v14H4zM8 3v5M16 3v5M4 10h16"/></svg>
           <span>Weekly plan</span>
         </button>
         <button class="tab" data-tab="recipes" type="button">
-          <svg viewBox="0 0 24 24"><path d="M6 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2V5a1 1 0 0 1 1-1Zm1 12h12M9 8h6"/></svg>
           <span>Recipes</span>
         </button>
         <button class="tab" data-tab="pantry" type="button">
-          <svg viewBox="0 0 24 24"><path d="M5 9h14v11H5zM7 4h10l2 5H5l2-5ZM9 13h6"/></svg>
           <span>Pantry</span>
         </button>
         <button class="tab" data-tab="shopping" type="button">
-          <svg viewBox="0 0 24 24"><path d="m7 9 2-5m8 5-2-5M4 9h16l-1.5 11h-13L4 9Zm5 4v3m6-3v3"/></svg>
           <span>Shopping</span>
         </button>
       </nav>
-
-      <button class="agent-prompt" type="button" data-copy-agent-prompt>
-        <span>Agent prompt</span>
-        <strong>Copy</strong>
-      </button>
-
-      <div class="sidebar-footer">
-        <span id="mcpStatus" class="mcp-pill" title="WebMCP connection status">
-          <i aria-hidden="true"></i>
-          <span>Checking WebMCP…</span>
-        </span>
-        <small>Local-first · Private by default</small>
-      </div>
     </aside>
 
     <section class="workspace">
@@ -55,11 +38,14 @@
         <div class="mobile-brand">
           <strong>Savour</strong>
         </div>
-        <div class="page-path">
-          <strong>Meal planner</strong>
-        </div>
+        <span id="mcpStatus" class="mcp-pill" title="WebMCP connection status">
+          <span>Checking WebMCP…</span>
+        </span>
         <div class="topbar-actions">
           <span class="privacy-note"><i></i> Saved on this device</span>
+          <button class="button ghost agent-prompt" type="button" data-copy-agent-prompt>
+            Agent prompt
+          </button>
           <button id="exportButton" class="button ghost" type="button">
             <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"/></svg>
             Export data
