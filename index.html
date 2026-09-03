@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="A local-first meal planner built for people and their agents with WebMCP." />
-  <meta name="theme-color" content="#120f10" />
+  <meta name="theme-color" content="#ffffff" />
   <title>Savour — plan with your agent</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="./styles.css" />
@@ -13,14 +13,11 @@
   <div class="app-layout">
     <aside class="sidebar">
       <a class="brand" href="#planner" aria-label="Savour home">
-        <span class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M19.5 4.5c-4.8.2-9.1 2-11.5 5.1-2.5 3.2-1.9 6.8 0 9.1 2-1.6 3.9-3.6 5.8-5.9-1.5 2.9-3.4 5.2-5.4 7 2.6 1.1 5.6.4 7.5-2 2.5-3.2 3.3-8 3.6-13.3Z"/></svg>
-        </span>
-        <span>Savour<span class="brand-dot">†</span></span>
+        <span>Savour</span>
       </a>
 
       <nav class="tabs" aria-label="Meal planner sections">
-        <p class="nav-label">The kitchen</p>
+        <p class="nav-label">Workspace</p>
         <button class="tab active" data-tab="planner" type="button">
           <svg viewBox="0 0 24 24"><path d="M4 5.5h16v14H4zM8 3v5M16 3v5M4 10h16"/></svg>
           <span>Weekly plan</span>
@@ -39,15 +36,10 @@
         </button>
       </nav>
 
-      <div class="agent-card">
-        <div class="agent-icon" aria-hidden="true">✦</div>
-        <strong>Plan with an agent</strong>
-        <p>Recipes, pantry stock and meal history—one conversation.</p>
-        <button class="agent-prompt" type="button" data-copy-agent-prompt>
-          Copy starter prompt
-          <span aria-hidden="true">↗</span>
-        </button>
-      </div>
+      <button class="agent-prompt" type="button" data-copy-agent-prompt>
+        <span>Agent prompt</span>
+        <strong>Copy</strong>
+      </button>
 
       <div class="sidebar-footer">
         <span id="mcpStatus" class="mcp-pill" title="WebMCP connection status">
@@ -61,15 +53,10 @@
     <section class="workspace">
       <header class="topbar">
         <div class="mobile-brand">
-          <span class="brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M19.5 4.5c-4.8.2-9.1 2-11.5 5.1-2.5 3.2-1.9 6.8 0 9.1 2-1.6 3.9-3.6 5.8-5.9-1.5 2.9-3.4 5.2-5.4 7 2.6 1.1 5.6.4 7.5-2 2.5-3.2 3.3-8 3.6-13.3Z"/></svg>
-          </span>
-          <strong>Savour.</strong>
+          <strong>Savour</strong>
         </div>
         <div class="page-path">
-          <span>Savour</span>
-          <i>/</i>
-          <strong>Weekly table</strong>
+          <strong>Meal planner</strong>
         </div>
         <div class="topbar-actions">
           <span class="privacy-note"><i></i> Saved on this device</span>
@@ -81,27 +68,9 @@
       </header>
 
       <main>
-        <section class="hero">
-          <div class="hero-copy-block">
-            <p class="eyebrow">A record of what you eat</p>
-            <h1>Seven days.<br /><em>One table.</em></h1>
-            <p class="hero-copy">Plan meals, preserve recipes and turn the week into one exact shopping list.</p>
-          </div>
-          <div class="hero-visual" aria-label="Featured weeknight meal">
-            <img src="./assets/salmon-couscous.webp" alt="Salmon with couscous, broccolini, lemon and herb yogurt" />
-            <div class="hero-visual-shade"></div>
-            <span class="hero-kicker">Tonight's idea</span>
-            <div class="hero-meal">
-              <strong>Lemon salmon<br />with herb couscous</strong>
-              <span>30 min · high protein</span>
-            </div>
-          </div>
-        </section>
-
         <section id="planner" class="panel active" data-panel="planner">
           <div class="section-head">
             <div>
-              <p class="eyebrow">This week</p>
               <h2 id="weekTitle">Meal plan</h2>
             </div>
             <div class="week-controls">
@@ -115,7 +84,7 @@
             </div>
           </div>
           <div class="planner-intro">
-            <span><i></i> Click any meal slot to plan it</span>
+            <span>Click a slot to add or edit a meal</span>
             <span>Breakfast · Lunch · Dinner</span>
           </div>
           <div id="plannerGrid" class="planner-grid"></div>
@@ -124,7 +93,6 @@
         <section id="recipes" class="panel" data-panel="recipes">
           <div class="section-head">
             <div>
-              <p class="eyebrow">Recipe memory</p>
               <h2>Your recipes</h2>
               <p class="section-copy">Every ingredient stays structured, so servings and shopping quantities remain exact.</p>
             </div>
@@ -139,7 +107,6 @@
         <section id="pantry" class="panel" data-panel="pantry">
           <div class="section-head">
             <div>
-              <p class="eyebrow">Already at home</p>
               <h2>Your pantry</h2>
               <p class="section-copy">Track what is on hand and Savour will subtract it from your next shop.</p>
             </div>
@@ -162,7 +129,6 @@
         <section id="shopping" class="panel" data-panel="shopping">
           <div class="section-head">
             <div>
-              <p class="eyebrow">Calculated for you</p>
               <h2>Shopping list</h2>
               <p class="section-copy">Scaled to planned servings and reduced by matching pantry quantities.</p>
             </div>
@@ -181,7 +147,6 @@
     <form id="recipeForm" method="dialog" class="dialog-form">
       <div class="dialog-head">
         <div>
-          <p class="eyebrow">Structured recipe</p>
           <h2 id="recipeDialogTitle">Add recipe</h2>
         </div>
         <button class="icon-button" value="cancel" type="button" data-close-dialog aria-label="Close">×</button>
@@ -211,7 +176,6 @@
     <form id="mealForm" method="dialog" class="dialog-form compact">
       <div class="dialog-head">
         <div>
-          <p class="eyebrow">Plan a meal</p>
           <h2 id="mealDialogTitle">Dinner</h2>
         </div>
         <button class="icon-button" value="cancel" type="button" data-close-dialog aria-label="Close">×</button>
