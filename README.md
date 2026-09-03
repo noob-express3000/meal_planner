@@ -1,4 +1,4 @@
-# Savour — Meal Planner
+# Meal Planner
 
 A polished, local-first meal planner designed for **people and browser agents to use together** through WebMCP.
 

@@ -4,16 +4,16 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Plan meals, save recipes and build shopping lists with WebMCP." />
-  <meta name="theme-color" content="#0b0d10" />
-  <title>Savour — plan with your agent</title>
+  <meta name="theme-color" content="#09090b" />
+  <title>Meal Planner</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
   <div class="app-layout">
-    <aside class="sidebar">
-      <a class="brand" href="#planner" aria-label="Savour home">
-        <span>Savour</span>
+    <header class="sidebar">
+      <a class="brand" href="#planner" aria-label="Meal Planner home">
+        <span>Meal Planner</span>
       </a>
 
       <nav class="tabs" aria-label="Meal planner sections">
@@ -30,26 +30,22 @@
           <span>Shopping</span>
         </button>
       </nav>
-      <button class="agent-prompt" type="button" data-copy-agent-prompt>
-        Copy agent prompt
-      </button>
-    </aside>
-
-    <section class="workspace">
-      <header class="topbar">
-        <div class="mobile-brand">
-          <strong>Savour</strong>
-        </div>
+      <div class="topbar-actions">
         <span id="mcpStatus" class="mcp-pill" title="WebMCP connection status">
           <span>Checking WebMCP…</span>
         </span>
-        <div class="topbar-actions">
-          <button id="exportButton" class="button ghost" type="button">
-            <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"/></svg>
-            Export data
-          </button>
-        </div>
-      </header>
+        <button class="button ghost agent-prompt" type="button" data-copy-agent-prompt aria-label="Copy agent prompt">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14v12H5zM8 10l2 2-2 2M12 14h4"/></svg>
+          <span>Agent prompt</span>
+        </button>
+        <button id="exportButton" class="button ghost" type="button" aria-label="Export meal data">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"/></svg>
+          <span>Export</span>
+        </button>
+      </div>
+    </header>
+
+    <section class="workspace">
 
       <main>
         <section id="planner" class="panel active" data-panel="planner">
