@@ -396,6 +396,12 @@ svg {
   gap: 12px;
 }
 
+.recipe-grid > .empty-state {
+  width: min(100%, 480px);
+  grid-column: 1 / -1;
+  justify-self: center;
+}
+
 .recipe-card {
   min-width: 0;
   display: flex;
