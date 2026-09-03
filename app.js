@@ -399,7 +399,7 @@ function renderRecipes() {
   const list = $("#recipeList");
   list.innerHTML = "";
   if (!state.recipes.length) {
-    list.innerHTML = `<div class="empty-state"><strong>No recipes yet.</strong>Add one here, or ask your WebMCP agent to save a recipe for you.</div>`;
+    list.innerHTML = `<div class="empty-state"><strong>No recipes</strong></div>`;
     return;
   }
 
@@ -431,7 +431,7 @@ function renderRecipes() {
 function renderPantry() {
   const list = $("#pantryList");
   const items = listPantry();
-  list.innerHTML = items.length ? "" : `<div class="empty-state"><strong>Your pantry is empty.</strong>Add ingredients you already have so shopping quantities can be reduced automatically.</div>`;
+  list.innerHTML = items.length ? "" : `<div class="empty-state"><strong>Pantry empty</strong></div>`;
   for (const item of items) {
     const row = document.createElement("div");
     row.className = "list-row";
@@ -448,7 +448,7 @@ function currentWeekRange() {
 function renderShopping() {
   const list = $("#shoppingList");
   const items = buildShoppingList({ ...currentWeekRange(), subtract_pantry: true });
-  list.innerHTML = items.length ? "" : `<div class="empty-state"><strong>Nothing to buy yet.</strong>Plan meals for this week and the list will be calculated automatically.</div>`;
+  list.innerHTML = items.length ? "" : `<div class="empty-state"><strong>Shopping list empty</strong></div>`;
   for (const item of items) {
     const row = document.createElement("div");
     row.className = "list-row";
@@ -517,9 +517,9 @@ function bindUI() {
     const prompt = "Plan four dinners from my saved recipes, use what is already in my pantry, avoid repeating last week, then build my shopping list.";
     try {
       await navigator.clipboard.writeText(prompt);
-      showToast("Starter prompt copied");
+      showToast("Agent prompt copied");
     } catch {
-      showToast("Copy the starter prompt from the README");
+      showToast("Prompt available in the README");
     }
   });
 
