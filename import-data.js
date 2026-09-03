@@ -178,9 +178,9 @@
               description: "Complete object previously returned by export_meal_data",
               properties: {
                 version: { type: "number", enum: [1] },
-                recipes: { type: "array" },
-                plans: { type: "array" },
-                pantry: { type: "array" },
+                recipes: { type: "array", items: { type: "object", additionalProperties: true } },
+                plans: { type: "array", items: { type: "object", additionalProperties: true } },
+                pantry: { type: "array", items: { type: "object", additionalProperties: true } },
                 createdAt: { type: "string" },
                 updatedAt: { type: "string" }
               },
