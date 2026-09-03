@@ -16,7 +16,7 @@ The application stores recipes, pantry inventory, dated meal plans and optional 
 | History | Meal-plan records remain queryable by date range |
 | Pantry | Ingredient name, quantity and unit |
 | Shopping list | Required quantity, pantry quantity used, remaining quantity and contributing recipes |
-| Shopping profile | Optional user-supplied location and preferred stores; pricing currency is resolved by the agent from that location |
+| Shopping profile | Optional user-supplied location, preferred stores and currency |
 | Price quotes | Ingredient, package size, store, price, location, promotion, expiry and optional source URL |
 | Shopping estimate | Package-aware estimated cost per item, priced-item coverage and basket total |
 | Export | Complete core meal-planning state snapshot as JSON |
@@ -122,17 +122,15 @@ Recipes have separate read-only viewing and editing flows.
 
 The Shopping view keeps the calculated quantity visible and adds an optional estimated purchase cost. A user can save a city/region and preferred retailers manually. Relevant saved promotions for current shopping-list ingredients are shown without creating a general advertising feed.
 
-The header reports the number of WebMCP tools registered in the current browser. Agent Prompt copies the meal-planning example request. The Shopping view includes a Price with agent action that copies a pricing-specific agent request. Export downloads the stored core meal-planning state.
+The header reports the actual number of WebMCP tools currently discoverable through `document.modelContext.getTools()`. Agent Prompt copies the meal-planning example request. The Shopping view includes a Price with agent action that copies a pricing-specific agent request. Export downloads the stored core meal-planning state.
 
 The interface remains usable without WebMCP. Agent tools require ChatGPT's in-app browser or a WebMCP-enabled Chrome build.
 
 ## Price data
 
-Price data is deliberately provider-agnostic. The page does not contain retailer credentials, a hard-coded grocery data provider or a hard-coded national currency. Price quotes are structured records written by the user or an agent and include location and freshness metadata where available.
+Price data is deliberately provider-agnostic. The page does not contain retailer credentials or a hard-coded grocery data provider. Price quotes are structured records written by the user or an agent and include location and freshness metadata where available.
 
-The user supplies only the shopping location they want used. The agent maps that location to the appropriate ISO 4217 currency and uses regional price sources when available. This keeps the same workflow usable across countries while allowing price-data coverage to vary by market.
-
-Expired promotion quotes are ignored automatically, and quotes from a different explicitly saved location are not used in the active estimate.
+This keeps the deployed application static while allowing an agent to use current regional data sources when available. Expired promotion quotes are ignored automatically, and quotes from a different explicitly saved location are not used in the active estimate.
 
 ## Run locally
 
@@ -157,6 +155,7 @@ Render configuration is included in render.yaml. Netlify configuration is includ
 | index.html | Application markup and controls |
 | styles.css | Responsive interface styles |
 | app.js | Core state model, calculations, UI logic and WebMCP tools |
+| webmcp-status.js | Counts discoverable WebMCP tools through the browser API and keeps the status badge accurate |
 | recipe-view.js | Read-only recipe-view behavior and localization-helper loader |
 | recipe-view.css | Read-only recipe-view styling |
 | shopping-pricing.js | Optional location profile, price quotes, package-aware basket estimates, promotions and pricing WebMCP tools |
