@@ -1,137 +1,123 @@
 # Meal Planner
 
-A polished, local-first meal planner designed for **people and browser agents to use together** through WebMCP.
+Static meal-planning application with a WebMCP interface.
 
-Instead of forcing an agent to scrape buttons and cards, Meal Planner exposes its real application capabilities as structured browser tools. The website becomes durable meal memory and a deterministic calculation layer; the agent handles conversational planning and reasoning.
+Live application: https://meal-planner-llai.onrender.com/
 
-## The demo interaction
+The application stores recipes, pantry inventory and dated meal plans in browser localStorage. It derives shopping quantities from the stored records. The human interface and WebMCP tools call the same functions and modify the same state.
 
-Ask a WebMCP-capable browser agent:
+## Functional scope
+
+| Area | Stored or calculated data |
+| --- | --- |
+| Recipes | Name, base servings, preparation time, cooking time, tags, ingredients and ordered instructions |
+| Ingredients | Name, numeric quantity or unquantified value, and unit |
+| Meal plans | Date, breakfast/lunch/dinner slot, recipe reference and serving count |
+| History | Meal-plan records remain queryable by date range |
+| Pantry | Ingredient name, quantity and unit |
+| Shopping list | Required quantity, pantry quantity used, remaining quantity and contributing recipes |
+| Export | Complete state snapshot as JSON |
+
+Recipe quantities are scaled by planned servings. Shopping calculations group ingredients by normalized name and unit, sum the scaled requirements, and optionally subtract matching pantry stock. The application does not perform unit conversion.
+
+Deleting a recipe also removes meal-plan entries that reference it. Setting a pantry quantity to zero removes that pantry record.
+
+## WebMCP implementation
+
+The application registers 13 tools with document.modelContext.registerTool():
+
+| Tool | Operation |
+| --- | --- |
+| meal_context | Return recipes, pantry inventory, planned meals and calculated shopping items for a date range |
+| list_recipes | Filter recipes by text, tags and maximum total cooking time |
+| get_recipe | Return one complete recipe and optionally scale its ingredient quantities |
+| save_recipe | Create or update a structured recipe |
+| delete_recipe | Delete a recipe and its dependent planned meals |
+| get_meal_plan | Return planned meals for a date range |
+| plan_meal | Create or replace one dated meal slot |
+| plan_meals | Create or replace multiple meal slots in one call |
+| remove_meal | Remove one dated meal slot |
+| list_pantry | Return current pantry inventory |
+| set_pantry_item | Create, replace or remove a pantry quantity |
+| build_shopping_list | Calculate shopping quantities for a date range |
+| export_meal_data | Return the complete stored state |
+
+Each tool defines a JSON input schema, validates input through the application functions, returns structured JSON-safe data and updates the visible page after a mutation.
+
+There is no separate MCP server. Tool registration and execution happen in the page.
+
+## State flow
+
+1. A UI event or WebMCP tool calls an application function.
+2. The function validates and normalizes the input.
+3. The function reads or modifies the in-memory state.
+4. Mutations write the complete versioned state to localStorage.
+5. The planner, recipe list, pantry and shopping list rerender from that state.
+
+Storage key: meal-planner.webmcp.v1
+
+No account, backend service or database is required. State is specific to the browser profile and site origin. The Export action creates a portable JSON snapshot.
+
+## Agent workflow
+
+Example request:
 
 > Plan four dinners from my saved recipes, use what is already in my pantry, avoid repeating last week, then build my shopping list.
 
-The agent can read recipe memory, pantry inventory and prior plans, choose recipes with the user, write the approved plan back to the page, and calculate exact shopping quantities without guessing at the UI.
+Expected tool sequence:
 
-## What it remembers
+1. meal_context reads the current recipes, pantry, current plan and relevant history.
+2. list_recipes or get_recipe retrieves additional recipe detail when required.
+3. The agent presents or selects a plan.
+4. plan_meals writes the approved meal slots.
+5. build_shopping_list returns scaled requirements after pantry subtraction.
+6. The same changes are immediately visible in the human interface.
 
-Data is stored locally in the browser under a versioned storage key. No account or backend is required.
+This division is intentional:
 
+- The user supplies preferences and approves decisions.
+- The agent handles selection and multi-step orchestration.
+- The website owns persistence, validation, state mutation and quantity calculations.
+
+## Interface
+
+The interface provides four views:
+
+- Weekly plan
 - Recipes
-  - name
-  - base servings
-  - prep time
-  - cook time
-  - tags
-  - structured ingredient name / quantity / unit
-  - ordered instructions
-  - created / updated timestamps
-- Meal plans
-  - date
-  - breakfast / lunch / dinner slot
-  - recipe reference
-  - planned servings
-  - historical weeks remain queryable
 - Pantry
-  - ingredient
-  - quantity
-  - unit
-- Shopping calculations
-  - scale recipe ingredients to planned servings
-  - aggregate matching ingredient + unit pairs
-  - subtract matching pantry quantities
+- Shopping
 
-The **Export** button produces a JSON backup of all stored data.
+The header reports the number of WebMCP tools registered in the current browser. Agent Prompt copies the example request. Export downloads the stored state.
 
-## WebMCP tools
-
-The app currently registers 13 imperative tools with `document.modelContext.registerTool()`:
-
-| Tool | Purpose |
-| --- | --- |
-| `meal_context` | Read recipes, pantry, plan and shopping list for a date range in one planning call |
-| `list_recipes` | Search recipes by name, tag, ingredient or total time |
-| `get_recipe` | Retrieve a complete recipe and optionally scale it to target servings |
-| `save_recipe` | Create/update a structured recipe |
-| `delete_recipe` | Delete a recipe and dependent planned meals |
-| `get_meal_plan` | Read planned meals and historical weeks |
-| `plan_meal` | Write one meal slot |
-| `plan_meals` | Write several approved meal slots in one agent call |
-| `remove_meal` | Remove one planned slot |
-| `list_pantry` | Read on-hand inventory |
-| `set_pantry_item` | Set/remove an ingredient quantity |
-| `build_shopping_list` | Calculate scaled shopping quantities, optionally subtracting pantry stock |
-| `export_meal_data` | Return the complete local data snapshot |
-
-All tool implementations call the **same functions used by the human UI**. Tool calls immediately update the visible interface and persisted state.
-
-Example registration pattern:
-
-```js
-await document.modelContext.registerTool({
-  name: "plan_meal",
-  description: "Create or replace one meal-plan slot for a date.",
-  inputSchema: {
-    type: "object",
-    properties: {
-      date: { type: "string" },
-      meal_type: { type: "string", enum: ["breakfast", "lunch", "dinner"] },
-      recipe_id: { type: "string" },
-      servings: { type: "number", minimum: 0.01 }
-    },
-    required: ["date", "meal_type", "recipe_id", "servings"],
-    additionalProperties: false
-  },
-  execute: async (input) => planMeal(input)
-});
-```
-
-## Why WebMCP matters here
-
-Meal planning is naturally conversational, but the underlying state is not. Recipes have exact quantities. Weeks have dates. Pantry stock has units. Shopping lists require deterministic arithmetic. Prior meal plans matter when a user says “not what I had last week.”
-
-Without WebMCP, an agent has to infer this state from visual UI or depend on a separate proprietary backend integration. With WebMCP, the site itself exposes the authoritative operations and data structures directly to the browser agent.
-
-The division of labor is deliberate:
-
-- **Human:** preferences, approval, edits, visual overview.
-- **Agent:** conversational reasoning, comparison, orchestration.
-- **Website tools:** persistence, validation, exact data mutation and quantity math.
+The interface remains usable without WebMCP. Agent tools require ChatGPT's in-app browser or a WebMCP-enabled Chrome build.
 
 ## Run locally
 
-There is no build step and no dependency install.
+No package installation or build step is required.
 
-```bash
+~~~bash
 python -m http.server 8080
-```
+~~~
 
-Open `http://localhost:8080`.
+Open http://localhost:8080/.
 
-For WebMCP testing, use a supported browser environment. The Challenge supports ChatGPT's in-app browser or a WebMCP-enabled Chrome build. The green header badge reports how many tools registered successfully.
+## Deployment
 
-## Deploy
+The project is a static site. Serve the repository root over HTTPS.
 
-This is a static site. Deploy the repository root to any static host (Netlify, Vercel, Cloudflare Pages, GitHub Pages, Render static sites, etc.). HTTPS is recommended for the browser API and clipboard features.
+Render configuration is included in render.yaml. Netlify configuration is included in netlify.toml.
 
-For Netlify, `netlify.toml` is already included and the publish directory is the repository root.
+## Repository structure
 
-## Suggested <3 minute demo
-
-1. Open the live site in a WebMCP-capable browser and show the tool-count badge.
-2. Ask the agent to save 2–3 recipes with real quantities and cooking times.
-3. Add several pantry items from the UI or via the agent.
-4. Ask the agent to inspect current context and plan meals for the week.
-5. Show the planner update immediately as tools execute.
-6. Ask for the shopping list; show serving scaling and pantry subtraction.
-7. Ask what was planned in the previous week to demonstrate persistent history.
-
-## Submission framing
-
-**Strong fit for WebMCP:** meal planning requires a conversational agent to coordinate with exact, stateful application data. Structured tools remove UI guessing and make planning reliable.
-
-**Better UX:** the user can switch freely between direct manipulation and natural language. Both surfaces modify the same state.
-
-**Previously difficult:** a general browser agent can now reason over a site's private local recipe/pantry/plan state and safely mutate it through explicit schemas without a bespoke remote MCP server or fragile DOM automation.
+| File | Purpose |
+| --- | --- |
+| index.html | Application markup and controls |
+| styles.css | Responsive interface styles |
+| app.js | State model, calculations, UI logic and WebMCP tools |
+| favicon.svg | Site icon |
+| render.yaml | Render static-site configuration |
+| netlify.toml | Netlify static-site configuration |
 
 ## License
 
