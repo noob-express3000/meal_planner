@@ -20,6 +20,7 @@ The application stores recipes, pantry inventory, dated meal plans and optional 
 | Price quotes | Ingredient, package size, store, price, location, promotion, expiry and optional source URL |
 | Shopping estimate | Package-aware estimated cost per item, priced-item coverage and basket total |
 | Export | Complete core meal-planning state snapshot as JSON |
+| Import | Validated version 1 snapshot restoring recipes, meal-plan history and pantry |
 
 Recipe quantities are scaled by planned servings. Shopping calculations group ingredients by normalized name and unit, sum the scaled requirements, and optionally subtract matching pantry stock. Core recipe and pantry calculations do not attempt arbitrary ingredient-unit conversion.
 
@@ -29,7 +30,7 @@ Deleting a recipe also removes meal-plan entries that reference it. Setting a pa
 
 ## WebMCP implementation
 
-The application registers 19 tools with document.modelContext.registerTool():
+The application registers 20 tools with document.modelContext.registerTool():
 
 | Tool | Operation |
 | --- | --- |
@@ -46,6 +47,7 @@ The application registers 19 tools with document.modelContext.registerTool():
 | set_pantry_item | Create, replace or remove a pantry quantity |
 | build_shopping_list | Calculate shopping quantities for a date range |
 | export_meal_data | Return the complete stored meal-planning state |
+| import_meal_data | Validate and replace core meal-planning state from a version 1 export snapshot |
 | shopping_price_context | Return the saved shopping location, preferred stores, current shopping requirements and existing current price quotes |
 | set_shopping_profile | Save or clear the user-supplied shopping location and preferred stores |
 | set_shopping_currency | Set the ISO 4217 currency inferred by the agent from the user's saved shopping location |
@@ -70,7 +72,7 @@ Storage keys:
 - `meal-planner.webmcp.v1` — recipes, meal plans and pantry
 - `meal-planner.shopping-pricing.v1` — optional shopping profile and price quotes
 
-No account, backend service or database is required. State is specific to the browser profile and site origin. The Export action creates a portable JSON snapshot of the core meal-planning state.
+No account, backend service or database is required. State is specific to the browser profile and site origin. The Export action creates a portable JSON snapshot of the core meal-planning state. Import validates that snapshot before replacing recipes, plans and pantry; shopping location and saved price quotes are left unchanged.
 
 ## Agent workflow
 
@@ -122,7 +124,7 @@ Recipes have separate read-only viewing and editing flows.
 
 The Shopping view keeps the calculated quantity visible and adds an optional estimated purchase cost. A user can save a city/region and preferred retailers manually. Relevant saved promotions for current shopping-list ingredients are shown without creating a general advertising feed.
 
-The header reports the actual number of WebMCP tools currently discoverable through `document.modelContext.getTools()`. Agent Prompt copies the meal-planning example request. The Shopping view includes a Price with agent action that copies a pricing-specific agent request. Export downloads the stored core meal-planning state.
+The header reports the actual number of WebMCP tools currently discoverable through `document.modelContext.getTools()`. Agent Prompt copies the meal-planning example request. Import and Export provide a portable round-trip for core meal data. The Shopping view includes a Price with agent action that copies a pricing-specific agent request.
 
 The interface remains usable without WebMCP. Agent tools require ChatGPT's in-app browser or a WebMCP-enabled Chrome build.
 
@@ -156,6 +158,7 @@ Render configuration is included in render.yaml. Netlify configuration is includ
 | styles.css | Responsive interface styles |
 | app.js | Core state model, calculations, UI logic and WebMCP tools |
 | webmcp-status.js | Counts discoverable WebMCP tools through the browser API and keeps the status badge accurate |
+| import-data.js | Validated JSON import UI and `import_meal_data` WebMCP tool |
 | recipe-view.js | Read-only recipe-view behavior and localization-helper loader |
 | recipe-view.css | Read-only recipe-view styling |
 | shopping-pricing.js | Optional location profile, price quotes, package-aware basket estimates, promotions and pricing WebMCP tools |
