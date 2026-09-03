@@ -98,8 +98,17 @@
     return quote.validUntil < dateKey(new Date());
   }
 
+  function quoteMatchesLocation(quote) {
+    if (!pricing.location || !quote.location) return true;
+    return key(quote.location) === key(pricing.location);
+  }
+
   function matchingQuotes(item) {
-    const candidates = pricing.quotes.filter((quote) => key(quote.ingredient) === key(item.name) && !isExpired(quote));
+    let candidates = pricing.quotes.filter((quote) =>
+      key(quote.ingredient) === key(item.name) &&
+      !isExpired(quote) &&
+      quoteMatchesLocation(quote)
+    );
     if (!pricing.preferredStores.length) return candidates;
     const wanted = new Set(pricing.preferredStores.map(key));
     const preferred = candidates.filter((quote) => wanted.has(key(quote.store)));
@@ -193,8 +202,8 @@
         sourceUrl: clean(input.source_url),
         updatedAt: now
       };
-      const quoteKey = `${key(record.ingredient)}|${key(record.store)}|${record.packageQuantity}|${key(record.packageUnit)}`;
-      pricing.quotes = pricing.quotes.filter((quote) => `${key(quote.ingredient)}|${key(quote.store)}|${quote.packageQuantity}|${key(quote.packageUnit)}` !== quoteKey);
+      const quoteKey = `${key(record.ingredient)}|${key(record.store)}|${record.packageQuantity}|${key(record.packageUnit)}|${key(record.location)}`;
+      pricing.quotes = pricing.quotes.filter((quote) => `${key(quote.ingredient)}|${key(quote.store)}|${quote.packageQuantity}|${key(quote.packageUnit)}|${key(quote.location)}` !== quoteKey);
       pricing.quotes.push(record);
     }
     pricing.quotes = pricing.quotes.filter((quote) => !isExpired(quote));
@@ -207,6 +216,20 @@
     pricing.quotes = [];
     persistPricing();
     return { removed };
+  }
+
+  function currentPromotions(items) {
+    const wantedIngredients = new Set(items.map((item) => key(item.name)));
+    const wantedStores = new Set(pricing.preferredStores.map(key));
+    const seen = new Set();
+    return pricing.quotes.filter((quote) => {
+      if (!quote.promotion || isExpired(quote) || !quoteMatchesLocation(quote) || !wantedIngredients.has(key(quote.ingredient))) return false;
+      if (wantedStores.size && !wantedStores.has(key(quote.store))) return false;
+      const promoKey = `${key(quote.ingredient)}|${key(quote.store)}|${key(quote.promotion)}`;
+      if (seen.has(promoKey)) return false;
+      seen.add(promoKey);
+      return true;
+    });
   }
 
   function injectUI() {
@@ -250,9 +273,9 @@
     deals.id = "shoppingDeals";
     deals.className = "shopping-deals";
 
-    list.before(deals);
-    list.before(summary);
     list.before(controls);
+    list.before(summary);
+    list.before(deals);
 
     controls.addEventListener("submit", (event) => {
       event.preventDefault();
@@ -317,9 +340,9 @@
     }
 
     const deals = document.querySelector("#shoppingDeals");
-    const promoItems = result.items.filter((item) => item.estimate?.promotion);
-    deals.innerHTML = promoItems.map((item) => `<span class="shopping-deal"><strong>${escapeHtml(item.name)}</strong> · ${escapeHtml(item.estimate.store)} · ${escapeHtml(item.estimate.promotion)}</span>`).join("");
-    deals.hidden = promoItems.length === 0;
+    const promotions = currentPromotions(result.items);
+    deals.innerHTML = promotions.map((quote) => `<span class="shopping-deal"><strong>${escapeHtml(quote.ingredient)}</strong> · ${escapeHtml(quote.store)} · ${escapeHtml(quote.promotion)}</span>`).join("");
+    deals.hidden = promotions.length === 0;
   }
 
   function priceContext() {
@@ -336,7 +359,7 @@
         recipes: item.recipes,
         currentEstimate: item.estimate
       })),
-      savedQuotes: pricing.quotes.filter((quote) => !isExpired(quote))
+      savedQuotes: pricing.quotes.filter((quote) => !isExpired(quote) && quoteMatchesLocation(quote))
     };
   }
 
