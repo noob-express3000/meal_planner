@@ -1,6 +1,6 @@
-# Meal Planner
+# Savour — Meal Planner
 
-A local-first meal planner designed for **people and browser agents to use together** through WebMCP.
+A polished, local-first meal planner designed for **people and browser agents to use together** through WebMCP.
 
 Instead of forcing an agent to scrape buttons and cards, Meal Planner exposes its real application capabilities as structured browser tools. The website becomes durable meal memory and a deterministic calculation layer; the agent handles conversational planning and reasoning.
 

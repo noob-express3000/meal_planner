@@ -4,99 +4,177 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="A local-first meal planner built for people and their agents with WebMCP." />
-  <title>Meal Planner — plan with your agent</title>
+  <meta name="theme-color" content="#1b211d" />
+  <title>Savour — plan with your agent</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <div class="shell">
-    <header class="topbar">
-      <a class="brand" href="#planner" aria-label="Meal Planner home">
-        <span class="brand-mark" aria-hidden="true">M</span>
-        <span>Meal Planner</span>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <a class="brand" href="#planner" aria-label="Savour home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M19.5 4.5c-4.8.2-9.1 2-11.5 5.1-2.5 3.2-1.9 6.8 0 9.1 2-1.6 3.9-3.6 5.8-5.9-1.5 2.9-3.4 5.2-5.4 7 2.6 1.1 5.6.4 7.5-2 2.5-3.2 3.3-8 3.6-13.3Z"/></svg>
+        </span>
+        <span>Savour<span class="brand-dot">.</span></span>
       </a>
-      <div class="topbar-actions">
-        <span id="mcpStatus" class="mcp-pill" title="WebMCP connection status">Checking WebMCP…</span>
-        <button id="exportButton" class="button ghost" type="button">Export</button>
-      </div>
-    </header>
-
-    <main>
-      <section class="hero">
-        <div>
-          <p class="eyebrow">Human + agent meal planning</p>
-          <h1>Your meals, remembered.</h1>
-          <p class="hero-copy">Save exact recipes, plan meals, track what is in the kitchen, and let your browser agent work with the same structured data you see here.</p>
-        </div>
-        <div class="agent-card">
-          <span class="agent-dot" aria-hidden="true"></span>
-          <div>
-            <strong>Try with an agent</strong>
-            <p>“Plan four dinners from my saved recipes, use what is in my pantry, avoid repeats from last week, then build my shopping list.”</p>
-          </div>
-        </div>
-      </section>
 
       <nav class="tabs" aria-label="Meal planner sections">
-        <button class="tab active" data-tab="planner" type="button">Planner</button>
-        <button class="tab" data-tab="recipes" type="button">Recipes</button>
-        <button class="tab" data-tab="pantry" type="button">Pantry</button>
-        <button class="tab" data-tab="shopping" type="button">Shopping</button>
+        <p class="nav-label">Kitchen</p>
+        <button class="tab active" data-tab="planner" type="button">
+          <svg viewBox="0 0 24 24"><path d="M4 5.5h16v14H4zM8 3v5M16 3v5M4 10h16"/></svg>
+          <span>Weekly plan</span>
+        </button>
+        <button class="tab" data-tab="recipes" type="button">
+          <svg viewBox="0 0 24 24"><path d="M6 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2V5a1 1 0 0 1 1-1Zm1 12h12M9 8h6"/></svg>
+          <span>Recipes</span>
+        </button>
+        <button class="tab" data-tab="pantry" type="button">
+          <svg viewBox="0 0 24 24"><path d="M5 9h14v11H5zM7 4h10l2 5H5l2-5ZM9 13h6"/></svg>
+          <span>Pantry</span>
+        </button>
+        <button class="tab" data-tab="shopping" type="button">
+          <svg viewBox="0 0 24 24"><path d="m7 9 2-5m8 5-2-5M4 9h16l-1.5 11h-13L4 9Zm5 4v3m6-3v3"/></svg>
+          <span>Shopping</span>
+        </button>
       </nav>
 
-      <section id="planner" class="panel active" data-panel="planner">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">This week</p>
-            <h2 id="weekTitle">Meal plan</h2>
-          </div>
-          <div class="week-controls">
-            <button id="previousWeek" class="icon-button" type="button" aria-label="Previous week">←</button>
-            <button id="todayWeek" class="button ghost" type="button">Today</button>
-            <button id="nextWeek" class="icon-button" type="button" aria-label="Next week">→</button>
-          </div>
-        </div>
-        <div id="plannerGrid" class="planner-grid"></div>
-      </section>
+      <div class="agent-card">
+        <div class="agent-icon" aria-hidden="true">✦</div>
+        <strong>Plan it with an agent</strong>
+        <p>Use saved recipes, pantry stock and meal history in one conversation.</p>
+        <button class="agent-prompt" type="button" data-copy-agent-prompt>
+          Copy starter prompt
+          <span aria-hidden="true">↗</span>
+        </button>
+      </div>
 
-      <section id="recipes" class="panel" data-panel="recipes">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">Recipe memory</p>
-            <h2>Recipes</h2>
-          </div>
-          <button id="addRecipeButton" class="button primary" type="button">Add recipe</button>
-        </div>
-        <div id="recipeList" class="recipe-grid"></div>
-      </section>
+      <div class="sidebar-footer">
+        <span id="mcpStatus" class="mcp-pill" title="WebMCP connection status">
+          <i aria-hidden="true"></i>
+          <span>Checking WebMCP…</span>
+        </span>
+        <small>Local-first · Private by default</small>
+      </div>
+    </aside>
 
-      <section id="pantry" class="panel" data-panel="pantry">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">On hand</p>
-            <h2>Pantry</h2>
-          </div>
+    <section class="workspace">
+      <header class="topbar">
+        <div class="mobile-brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M19.5 4.5c-4.8.2-9.1 2-11.5 5.1-2.5 3.2-1.9 6.8 0 9.1 2-1.6 3.9-3.6 5.8-5.9-1.5 2.9-3.4 5.2-5.4 7 2.6 1.1 5.6.4 7.5-2 2.5-3.2 3.3-8 3.6-13.3Z"/></svg>
+          </span>
+          <strong>Savour.</strong>
         </div>
-        <form id="pantryForm" class="inline-form">
-          <input id="pantryName" name="name" placeholder="Ingredient" required />
-          <input id="pantryQuantity" name="quantity" type="number" min="0" step="any" placeholder="Qty" required />
-          <input id="pantryUnit" name="unit" placeholder="Unit" />
-          <button class="button primary" type="submit">Save</button>
-        </form>
-        <div id="pantryList" class="simple-list"></div>
-      </section>
+        <div class="page-path">
+          <span>Meal planner</span>
+          <i>/</i>
+          <strong>Overview</strong>
+        </div>
+        <div class="topbar-actions">
+          <span class="privacy-note"><i></i> Saved on this device</span>
+          <button id="exportButton" class="button ghost" type="button">
+            <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"/></svg>
+            Export data
+          </button>
+        </div>
+      </header>
 
-      <section id="shopping" class="panel" data-panel="shopping">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">Calculated from the plan</p>
-            <h2>Shopping list</h2>
+      <main>
+        <section class="hero">
+          <div class="hero-copy-block">
+            <p class="eyebrow">Your kitchen, remembered</p>
+            <h1>Plan the week.<br /><em>Enjoy the evening.</em></h1>
+            <p class="hero-copy">Keep exact recipes, pantry quantities and meal history in one calm workspace—ready for you or your browser agent.</p>
           </div>
-          <button id="copyShoppingButton" class="button primary" type="button">Copy list</button>
-        </div>
-        <p class="muted">Quantities are scaled to planned servings and reduced by matching pantry items when units match.</p>
-        <div id="shoppingList" class="simple-list"></div>
-      </section>
-    </main>
+          <div class="hero-visual" aria-label="Featured weeknight meal">
+            <img src="./assets/salmon-couscous.webp" alt="Salmon with couscous, broccolini, lemon and herb yogurt" />
+            <div class="hero-visual-shade"></div>
+            <span class="hero-kicker">Tonight's idea</span>
+            <div class="hero-meal">
+              <strong>Lemon salmon<br />with herb couscous</strong>
+              <span>30 min · high protein</span>
+            </div>
+          </div>
+        </section>
+
+        <section id="planner" class="panel active" data-panel="planner">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">This week</p>
+              <h2 id="weekTitle">Meal plan</h2>
+            </div>
+            <div class="week-controls">
+              <button id="previousWeek" class="icon-button" type="button" aria-label="Previous week">
+                <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+              </button>
+              <button id="todayWeek" class="button ghost" type="button">Today</button>
+              <button id="nextWeek" class="icon-button" type="button" aria-label="Next week">
+                <svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="planner-intro">
+            <span><i></i> Click any meal slot to plan it</span>
+            <span>Breakfast · Lunch · Dinner</span>
+          </div>
+          <div id="plannerGrid" class="planner-grid"></div>
+        </section>
+
+        <section id="recipes" class="panel" data-panel="recipes">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Recipe memory</p>
+              <h2>Your recipes</h2>
+              <p class="section-copy">Every ingredient stays structured, so servings and shopping quantities remain exact.</p>
+            </div>
+            <button id="addRecipeButton" class="button primary" type="button">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+              Add recipe
+            </button>
+          </div>
+          <div id="recipeList" class="recipe-grid"></div>
+        </section>
+
+        <section id="pantry" class="panel" data-panel="pantry">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Already at home</p>
+              <h2>Your pantry</h2>
+              <p class="section-copy">Track what is on hand and Savour will subtract it from your next shop.</p>
+            </div>
+          </div>
+          <form id="pantryForm" class="inline-form">
+            <label class="sr-only" for="pantryName">Ingredient</label>
+            <input id="pantryName" name="name" placeholder="Ingredient" required />
+            <label class="sr-only" for="pantryQuantity">Quantity</label>
+            <input id="pantryQuantity" name="quantity" type="number" min="0" step="any" placeholder="Qty" required />
+            <label class="sr-only" for="pantryUnit">Unit</label>
+            <input id="pantryUnit" name="unit" placeholder="Unit" />
+            <button class="button primary" type="submit">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+              Add item
+            </button>
+          </form>
+          <div id="pantryList" class="simple-list"></div>
+        </section>
+
+        <section id="shopping" class="panel" data-panel="shopping">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Calculated for you</p>
+              <h2>Shopping list</h2>
+              <p class="section-copy">Scaled to planned servings and reduced by matching pantry quantities.</p>
+            </div>
+            <button id="copyShoppingButton" class="button primary" type="button">
+              <svg viewBox="0 0 24 24"><path d="M8 8h11v12H8zM5 16H4V4h11v1"/></svg>
+              Copy list
+            </button>
+          </div>
+          <div id="shoppingList" class="simple-list"></div>
+        </section>
+      </main>
+    </section>
   </div>
 
   <dialog id="recipeDialog">

@@ -513,6 +513,16 @@ function bindUI() {
   $("#todayWeek").addEventListener("click", () => { visibleWeek = mondayOf(new Date()); renderAll(); });
   $("#addRecipeButton").addEventListener("click", () => openRecipeDialog());
 
+  $("[data-copy-agent-prompt]")?.addEventListener("click", async () => {
+    const prompt = "Plan four dinners from my saved recipes, use what is already in my pantry, avoid repeating last week, then build my shopping list.";
+    try {
+      await navigator.clipboard.writeText(prompt);
+      showToast("Starter prompt copied");
+    } catch {
+      showToast("Copy the starter prompt from the README");
+    }
+  });
+
   $$('[data-close-dialog]').forEach((button) => button.addEventListener("click", () => button.closest("dialog").close()));
 
   $("#recipeForm").addEventListener("submit", (event) => {
