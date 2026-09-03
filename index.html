@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="A local-first meal planner built for people and their agents with WebMCP." />
+  <title>Meal Planner — plan with your agent</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="#planner" aria-label="Meal Planner home">
+        <span class="brand-mark" aria-hidden="true">M</span>
+        <span>Meal Planner</span>
+      </a>
+      <div class="topbar-actions">
+        <span id="mcpStatus" class="mcp-pill" title="WebMCP connection status">Checking WebMCP…</span>
+        <button id="exportButton" class="button ghost" type="button">Export</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Human + agent meal planning</p>
+          <h1>Your meals, remembered.</h1>
+          <p class="hero-copy">Save exact recipes, plan meals, track what is in the kitchen, and let your browser agent work with the same structured data you see here.</p>
+        </div>
+        <div class="agent-card">
+          <span class="agent-dot" aria-hidden="true"></span>
+          <div>
+            <strong>Try with an agent</strong>
+            <p>“Plan four dinners from my saved recipes, use what is in my pantry, avoid repeats from last week, then build my shopping list.”</p>
+          </div>
+        </div>
+      </section>
+
+      <nav class="tabs" aria-label="Meal planner sections">
+        <button class="tab active" data-tab="planner" type="button">Planner</button>
+        <button class="tab" data-tab="recipes" type="button">Recipes</button>
+        <button class="tab" data-tab="pantry" type="button">Pantry</button>
+        <button class="tab" data-tab="shopping" type="button">Shopping</button>
+      </nav>
+
+      <section id="planner" class="panel active" data-panel="planner">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">This week</p>
+            <h2 id="weekTitle">Meal plan</h2>
+          </div>
+          <div class="week-controls">
+            <button id="previousWeek" class="icon-button" type="button" aria-label="Previous week">←</button>
+            <button id="todayWeek" class="button ghost" type="button">Today</button>
+            <button id="nextWeek" class="icon-button" type="button" aria-label="Next week">→</button>
+          </div>
+        </div>
+        <div id="plannerGrid" class="planner-grid"></div>
+      </section>
+
+      <section id="recipes" class="panel" data-panel="recipes">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Recipe memory</p>
+            <h2>Recipes</h2>
+          </div>
+          <button id="addRecipeButton" class="button primary" type="button">Add recipe</button>
+        </div>
+        <div id="recipeList" class="recipe-grid"></div>
+      </section>
+
+      <section id="pantry" class="panel" data-panel="pantry">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">On hand</p>
+            <h2>Pantry</h2>
+          </div>
+        </div>
+        <form id="pantryForm" class="inline-form">
+          <input id="pantryName" name="name" placeholder="Ingredient" required />
+          <input id="pantryQuantity" name="quantity" type="number" min="0" step="any" placeholder="Qty" required />
+          <input id="pantryUnit" name="unit" placeholder="Unit" />
+          <button class="button primary" type="submit">Save</button>
+        </form>
+        <div id="pantryList" class="simple-list"></div>
+      </section>
+
+      <section id="shopping" class="panel" data-panel="shopping">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Calculated from the plan</p>
+            <h2>Shopping list</h2>
+          </div>
+          <button id="copyShoppingButton" class="button primary" type="button">Copy list</button>
+        </div>
+        <p class="muted">Quantities are scaled to planned servings and reduced by matching pantry items when units match.</p>
+        <div id="shoppingList" class="simple-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="recipeDialog">
+    <form id="recipeForm" method="dialog" class="dialog-form">
+      <div class="dialog-head">
+        <div>
+          <p class="eyebrow">Structured recipe</p>
+          <h2 id="recipeDialogTitle">Add recipe</h2>
+        </div>
+        <button class="icon-button" value="cancel" type="button" data-close-dialog aria-label="Close">×</button>
+      </div>
+      <input id="recipeId" type="hidden" />
+      <label>Recipe name<input id="recipeName" required /></label>
+      <div class="form-grid two">
+        <label>Servings<input id="recipeServings" type="number" min="1" step="1" value="2" required /></label>
+        <label>Prep minutes<input id="recipePrep" type="number" min="0" step="1" value="10" /></label>
+        <label>Cook minutes<input id="recipeCook" type="number" min="0" step="1" value="20" /></label>
+        <label>Tags<input id="recipeTags" placeholder="quick, vegetarian" /></label>
+      </div>
+      <label>Ingredients <span class="label-note">one per line: quantity | unit | ingredient</span>
+        <textarea id="recipeIngredients" rows="7" placeholder="2 | tbsp | olive oil&#10;400 | g | chickpeas&#10;1 | | lemon" required></textarea>
+      </label>
+      <label>Instructions <span class="label-note">one step per line</span>
+        <textarea id="recipeInstructions" rows="6" required></textarea>
+      </label>
+      <div class="dialog-actions">
+        <button class="button ghost" type="button" data-close-dialog>Cancel</button>
+        <button class="button primary" type="submit">Save recipe</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="mealDialog">
+    <form id="mealForm" method="dialog" class="dialog-form compact">
+      <div class="dialog-head">
+        <div>
+          <p class="eyebrow">Plan a meal</p>
+          <h2 id="mealDialogTitle">Dinner</h2>
+        </div>
+        <button class="icon-button" value="cancel" type="button" data-close-dialog aria-label="Close">×</button>
+      </div>
+      <input id="mealDate" type="hidden" />
+      <input id="mealType" type="hidden" />
+      <label>Recipe<select id="mealRecipe" required></select></label>
+      <label>Servings<input id="mealServings" type="number" min="1" step="1" value="2" required /></label>
+      <div class="dialog-actions">
+        <button class="button ghost" type="button" data-remove-meal>Remove meal</button>
+        <button class="button primary" type="submit">Save meal</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="./app.js" defer></script>
+</body>
+</html>
