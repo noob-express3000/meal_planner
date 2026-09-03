@@ -101,8 +101,9 @@
 
   renderRecipes();
 
-  const localizationScript = document.createElement("script");
-  localizationScript.src = "./shopping-localization.js";
-  localizationScript.defer = true;
-  document.head.append(localizationScript);
+  window.addEventListener("DOMContentLoaded", () => {
+    const localizationScript = document.createElement("script");
+    localizationScript.src = "./shopping-localization.js";
+    document.head.append(localizationScript);
+  }, { once: true });
 })();
